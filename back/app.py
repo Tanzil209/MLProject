@@ -67,5 +67,10 @@ def predict():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Add a welcome GET route
+@app.route('/', methods=['GET'])
+def welcome():
+    return jsonify({'message': 'Welcome to this API!'}), 200
+
 if __name__ == '__main__':
     app.run(debug=True)
