@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Button, Form, Alert, Spinner } from 'react-bootstrap';
+import { Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import './App.css'; // Import your custom CSS
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -27,7 +28,7 @@ function App() {
     setLoading(true); // Start loading state
 
     try {
-      const response = await axios.post('https://mlproject-api.onrender.com/predict', formData, {
+      const response = await axios.post('http://127.0.0.1:5000/predict', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -46,33 +47,43 @@ function App() {
   };
 
   return (
-    <Container className="mt-5">
-      <Row className="justify-content-md-center">
-        <Col md={6} className="text-center">
-          <h1 className="mb-4">Road Anomaly Detection</h1>
+    <div className="app-container">
+      <h1 className="app-title">Road Anomaly Detection</h1>
 
-          <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>Select an image to upload:</Form.Label>
-              <Form.Control type="file" onChange={handleFileChange} />
-            </Form.Group>
+      <form onSubmit={handleSubmit} className="upload-form">
+        <Form.Group controlId="formFile" className="mb-3">
+          <Form.Label>Select an image to upload:</Form.Label>
+          <OverlayTrigger
+            placement="right"
+            overlay={<Tooltip id="tooltip">JPEG, PNG formats allowed.</Tooltip>}
+          >
+            <Form.Control type="file" onChange={handleFileChange} />
+          </OverlayTrigger>
+        </Form.Group>
 
-            {loading ? (
-              <Spinner animation="border" role="status">
-                <span className="visually-hidden">Processing...</span>
-              </Spinner>
-            ) : (
-              <Button variant="primary" type="submit" className="mt-2">
-                Predict
-              </Button>
-            )}
-          </Form>
+        {selectedFile && (
+          <div className="image-preview-container">
+            <h5 className="image-description">Image You Uploaded:</h5>
+            <img
+              src={URL.createObjectURL(selectedFile)}
+              alt="Preview"
+              className="preview-image"
+            />
+          </div>
+        )}
 
-          {result && <Alert variant="success" className="mt-3">{result}</Alert>}
-          {errorMessage && <Alert variant="danger" className="mt-3">{errorMessage}</Alert>}
-        </Col>
-      </Row>
-    </Container>
+        {loading ? (
+          <div className="loading-spinner">Processing...</div>
+        ) : (
+          <Button variant="primary" type="submit" className="mt-2 btn-custom">
+            Predict
+          </Button>
+        )}
+      </form>
+
+      {result && <div className="result-message success">{result}</div>}
+      {errorMessage && <div className="result-message error">{errorMessage}</div>}
+    </div>
   );
 }
 
