@@ -12,13 +12,19 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Load the pre-trained CNN model
-model_path = 'my_model.h5'
+model_path = 'back/my_model_3.h5'
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"Model file not found at: {model_path}")
 model = load_model(model_path)
 
-# Define labels for the classes (these should match your model classes)
-labels = {0: "Accident Type 1", 1: "Accident Type 2", 2: "Accident Type 3", 3: "No Accident"}
+# Define labels for the classes (make sure these match your model's classes)
+labels = {
+    0: "Road Anomaly Type Accident",
+    1: "Road Anomaly Type Fight",
+    2: "Road Anomaly Type Fire",
+    3: "No Accident",
+    4: "Road Anomaly Type Snatching"  # Add Snatching class here
+}
 
 # Define folder for uploading images
 UPLOAD_FOLDER = 'uploads'
@@ -57,7 +63,7 @@ def predict():
         img = preprocess_image(filepath)
         predictions = model.predict(img)
         predicted_class = np.argmax(predictions)
-        predicted_label = labels[predicted_class]
+        predicted_label = labels.get(predicted_class, "Unknown Anomaly")  # Ensure label exists
 
         return jsonify({
             'message': f'This image contains a {predicted_label}',
