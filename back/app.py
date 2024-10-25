@@ -12,7 +12,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Load the pre-trained CNN model
-model_path = 'back/my_model.h5'
+model_path = 'my_model.h5'
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"Model file not found at: {model_path}")
 model = load_model(model_path)
